@@ -1,0 +1,62 @@
+using System;
+using System.Data.SqlClient;
+using System.Windows.Forms;
+
+namespace ADO_Insert_DataReader
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        string conStr = @"Data Source=.\SQLEXPRESS;Initial Catalog=CompanyDB;Integrated Security=True";
+
+        // Insert Record
+        private void btnInsert_Click(object sender, EventArgs e)
+        {
+            SqlConnection con = new SqlConnection(conStr);
+
+            string query = "INSERT INTO Employee(emp_name,gender,department,salary) VALUES(@name,@gender,@dept,@salary)";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            cmd.Parameters.AddWithValue("@name", txtName.Text);
+            cmd.Parameters.AddWithValue("@gender", cmbGender.Text);
+            cmd.Parameters.AddWithValue("@dept", cmbDepartment.Text);
+            cmd.Parameters.AddWithValue("@salary", txtSalary.Text);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+
+            MessageBox.Show("Record Inserted Successfully");
+        }
+
+        // Retrieve Record using DataReader
+        private void btnRetrieve_Click(object sender, EventArgs e)
+        {
+            SqlConnection con = new SqlConnection(conStr);
+
+            string query = "SELECT TOP 1 * FROM Employee ORDER BY emp_id DESC";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            con.Open();
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            if (dr.Read())
+            {
+                txtName.Text = dr["emp_name"].ToString();
+                cmbGender.Text = dr["gender"].ToString();
+                cmbDepartment.Text = dr["department"].ToString();
+                txtSalary.Text = dr["salary"].ToString();
+            }
+
+            dr.Close();
+            con.Close();
+        }
+    }
+}
